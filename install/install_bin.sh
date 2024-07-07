@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ln -s /usr/local/bin/notify  $PWD/../bin/notify
+ln -s  $PWD/../bin/notify /usr/local/bin/notify

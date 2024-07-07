@@ -26,7 +26,3 @@ esac
 # 添加 alias 到配置文件中
 echo "alias notify='/usr/local/bin/notify.sh'" >> $shell_config_file
 
-# 重新加载配置文件
-source $shell_config_file
-
-echo "Alias added and configuration file reloaded successfully."
