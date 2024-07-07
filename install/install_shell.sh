@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ln -s /usr/local/bin/notify.sh  $PWD/../notify.sh
+ln -s $PWD/../notify.sh /usr/local/bin/notify.sh
 echo "Symbolic link created successfully."
 # 获取用户的默认 shell
 user_shell=$(basename $SHELL)
