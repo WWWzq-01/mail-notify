@@ -1,4 +1,4 @@
-# test
+# mail-notify
 A tool for sending email notifications to users when a long-running program finishes.
 
 <!-- GETTING STARTED -->
@@ -13,12 +13,15 @@ To get a local copy up and running follow these simple example steps.
 
 refer to [ubuntu email smtp](https://blog.csdn.net/u010953692/article/details/121744436)
 ### Installation
-1. clone the repository
-2. create symbolic link
+1. Clone the repository
+2. Create a symbolic link
 ```
 sudo bash install_shell.sh
 ```
-3. reload the shell
+3. Reload the shell
 ```
 source ~/.bashrc
 ```
+### Usage
+`notify [command] [address]`
+- If [address] is not given, the default value is used.
