@@ -6,6 +6,9 @@ DEFAULT_EMAIL="wwwzq1222@163.com"
 # 检查是否提供了邮箱地址，如果没有则使用默认值
 EMAIL=${2:-$DEFAULT_EMAIL}
 
+# 获取当前工作目录
+CURRENT_DIR=$(pwd)
+
 # 创建临时文件用于捕获输出和错误
 OUTFILE=$(mktemp)
 ERRFILE=$(mktemp)
@@ -33,10 +36,10 @@ ERROR=$(cat "$ERRFILE")
 MAIL_CONTENT=$(mktemp)
 if [ $STATUS -eq 0 ]; then
     # 成功通知邮件内容
-    printf "The command '%s' has completed successfully.\n\nStart Time: %s\nEnd Time: %s\nExecution Time: %ds\n\nOutput:\n %s \n" "$1" "$START_TIME_READABLE" "$END_TIME_READABLE" "$EXECUTION_TIME" "$OUTPUT" > "$MAIL_CONTENT"
+    printf "The command '%s' has completed successfully.\n\nCurrent Directory: %s \n\nStart Time: %s\nEnd Time: %s\nExecution Time: %ds\n\nOutput:\n %s \n" "$1" "$CURRENT_DIR" "$START_TIME_READABLE" "$END_TIME_READABLE" "$EXECUTION_TIME" "$OUTPUT" > "$MAIL_CONTENT"
 else
     # 失败通知邮件内容
-    printf "The command '%s' has failed.\n\nStart Time: %s\nEnd Time: %s\nExecution Time: %ds\n\nOutput:\n %s \n\nError:\n %s \n" "$1" "$START_TIME_READABLE" "$END_TIME_READABLE" "$EXECUTION_TIME" "$OUTPUT" "$ERROR" > "$MAIL_CONTENT"
+    printf "The command '%s' has failed.\n\nCurrent Directory: %s \n\nStart Time: %s\nEnd Time: %s\nExecution Time: %ds\n\nOutput:\n %s \n\nError:\n %s \n" "$1" "$CURRENT_DIR" "$START_TIME_READABLE" "$END_TIME_READABLE" "$EXECUTION_TIME" "$OUTPUT" "$ERROR" > "$MAIL_CONTENT"
 fi
 
 # 发送邮件
