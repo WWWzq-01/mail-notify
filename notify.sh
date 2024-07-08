@@ -6,6 +6,9 @@ DEFAULT_EMAIL="wwwzq1222@163.com"
 # 检查是否提供了邮箱地址，如果没有则使用默认值
 EMAIL=${2:-$DEFAULT_EMAIL}
 
+# 获取当前工作目录
+CURRENT_DIR=$(pwd)
+
 # 创建临时文件用于捕获输出和错误
 OUTFILE=$(mktemp)
 ERRFILE=$(mktemp)
@@ -14,9 +17,11 @@ ERRFILE=$(mktemp)
 START_TIME=$(date +%s)
 START_TIME_READABLE=$(date)
 
-# 执行命令并分别捕获输出和错误
-eval "$1" >"$OUTFILE" 2>"$ERRFILE"
-STATUS=$?
+# 执行命令并分别捕获输出和错误，同时输出到终端
+{
+  eval "$1" 2> >(tee "$ERRFILE" >&2)
+} | tee "$OUTFILE"
+STATUS=${PIPESTATUS[0]}
 
 # 记录结束时间
 END_TIME=$(date +%s)
@@ -27,14 +32,18 @@ EXECUTION_TIME=$((END_TIME - START_TIME))
 OUTPUT=$(cat "$OUTFILE")
 ERROR=$(cat "$ERRFILE")
 
-# 检查命令执行状态
+# 创建邮件内容的临时文件
+MAIL_CONTENT=$(mktemp)
 if [ $STATUS -eq 0 ]; then
-    # 发送成功通知邮件，并附上命令的输出
-    echo -e "The command '$1' has completed successfully.\n\nStart Time: $START_TIME_READABLE\nEnd Time: $END_TIME_READABLE\nExecution Time: ${EXECUTION_TIME}s\n\nOutput:\n$OUTPUT" | mail -s "Command Completion Notification" "$EMAIL"
+    # 成功通知邮件内容
+    printf "The command '%s' has completed successfully.\n\nCurrent Directory: %s \n\nStart Time: %s\nEnd Time: %s\nExecution Time: %ds\n\nOutput:\n %s \n" "$1" "$CURRENT_DIR" "$START_TIME_READABLE" "$END_TIME_READABLE" "$EXECUTION_TIME" "$OUTPUT" > "$MAIL_CONTENT"
 else
-    # 发送失败通知邮件，并附上命令的输出和错误
-    echo -e "The command '$1' has failed.\n\nStart Time: $START_TIME_READABLE\nEnd Time: $END_TIME_READABLE\nExecution Time: ${EXECUTION_TIME}s\n\nOutput:\n$OUTPUT\n\nError:\n$ERROR" | mail -s "Command Failure Notification" "$EMAIL"
+    # 失败通知邮件内容
+    printf "The command '%s' has failed.\n\nCurrent Directory: %s \n\nStart Time: %s\nEnd Time: %s\nExecution Time: %ds\n\nOutput:\n %s \n\nError:\n %s \n" "$1" "$CURRENT_DIR" "$START_TIME_READABLE" "$END_TIME_READABLE" "$EXECUTION_TIME" "$OUTPUT" "$ERROR" > "$MAIL_CONTENT"
 fi
 
+# 发送邮件
+cat "$MAIL_CONTENT" | mail -s "Command Notification" "$EMAIL"
+
 # 清理临时文件
-rm "$OUTFILE" "$ERRFILE"
+rm "$OUTFILE" "$ERRFILE" "$MAIL_CONTENT"
